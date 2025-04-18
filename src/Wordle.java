@@ -12,7 +12,6 @@ public class Wordle {
 
     public Wordle(String answer){
         this.targetWord = answer;
-        targetWord =
 
     }
 
