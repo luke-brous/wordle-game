@@ -27,15 +27,12 @@ public class WordleTest {
         ArrayList<String> dict = new ArrayList<>(Arrays.asList("apple", "plate", "pleat"));
         Wordle w = new Wordle("apple", dict);
 
-        // 1) 'ample' → m is not in 'apple'
         assertEquals(Arrays.asList("green", "red",   "green", "green", "green"),
                 w.checkGuess("ample", w.getAnswer()));
 
-        // 2) 'paple' → p and a are present but mis-placed
         assertEquals(Arrays.asList("yellow","yellow","green", "green", "green"),
                 w.checkGuess("paple", w.getAnswer()));
 
-        // 3) 'pleap' → every letter appears, but none in correct spot
         assertEquals(Arrays.asList("yellow","yellow","yellow","yellow","yellow"),
                 w.checkGuess("pleap", w.getAnswer()));
     }
