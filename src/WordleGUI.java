@@ -30,6 +30,18 @@ public class WordleGUI {
             }
         }
 
+        String[] keyboardRows = {"qwertyuiop", "asdfghjkl", "zxcvbnm"
+        };
+
+        double x_keys = -70;
+        double y_keys = -40;
+        double keySize = 7;
+
+
+
+
+
+
 
 
 
