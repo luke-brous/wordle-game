@@ -33,11 +33,31 @@ public class WordleGUI {
         String[] keyboardRows = {"qwertyuiop", "asdfghjkl", "zxcvbnm"
         };
 
-        double x_keys = -70;
+        double x_keys = -60;
         double y_keys = -40;
-        double keySize = 7;
+        double keyWidth = 12;
+        double keyHeight = 10;
+
+        for (int i = 0; i < keyboardRows.length; i++) {
+            String keys = keyboardRows[i];
+            double rowY = y_keys - i * 16;
+
+            double offsetX = 0;
+            if (i == 1) {
+                offsetX = 8;
+            } else if (i == 2) {
+                offsetX = 16;
+            }
+
+            for (int j = 0; j < keys.length(); j++) {
+                double x = x_keys + offsetX + j * 14;
+                StdDraw.rectangle(x, rowY, keyWidth / 2,keyHeight / 2);
+                StdDraw.text(x, rowY, String.valueOf(keys.charAt(j)));
+
+            }
 
 
+        }
 
 
 
