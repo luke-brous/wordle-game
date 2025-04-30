@@ -150,17 +150,25 @@ public class WordleGUI {
 
     public void drawKeyboard() {
         String[] rows = {"qwertyuiop", "asdfghjkl", "zxcvbnm"};
-        double keyWidth = 12, keyHeight = 10;
-        double baseX = -60, baseY = -40;
+        double keyWidth = 16, keyHeight = 14;
+        double baseX = -80, baseY = -45;
 
         for (int r = 0; r < rows.length; r++) {
             String row = rows[r];
-            double offsetX = r == 1 ? 8 : (r == 2 ? 16 : 0);
-            double y = baseY - r * 16;
+            double offsetX;
+            if (r == 1) {
+                offsetX = 11;
+            } else if (r == 2) {
+                offsetX = 26;
+            } else {
+                offsetX = 0;
+            }
+
+            double y = baseY - r * 18;
 
             for (int i = 0; i < row.length(); i++) {
                 char letter = row.charAt(i);
-                double x = baseX + offsetX + i * 14;
+                double x = baseX + offsetX + i * 18;
                 String color = keyboardColors.getOrDefault(letter, "none");
 
                 switch (color) {
@@ -188,6 +196,39 @@ public class WordleGUI {
 
         StdDraw.show();
         StdDraw.setFont(new Font("Arial", Font.PLAIN, 14));
+    }
+
+
+    public boolean restartButtonClick{
+        double buttonX = 80;
+        double buttonY = -80;
+        double buttonWidth = 10;
+        double buttonHeight = 10;
+
+        StdDraw.setPenColor(Color.CYAN);
+        StdDraw.filledRectangle(buttonX, buttonY, buttonWidth / 2, buttonHeight / 2);
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.text(buttonX, buttonY, "Restart");
+        StdDraw.show();
+
+        while(true) {
+            if (StdDraw.isMousePressed()){
+                double mouseX = StdDraw.mouseX();
+                double mouseY = StdDraw.mouseY();
+                if (mouseX >= buttonX - buttonWidth && mouseX <= buttonX - buttonWidth &&
+                    mouseY >= buttonY - buttonHeight && mouseY <= buttonY - buttonHeight){
+
+                    StdDraw.pause(200);
+                    return true;
+
+                }
+            }
+            StdDraw.pause(10);
+        }
+
+
+
+
     }
 
 
