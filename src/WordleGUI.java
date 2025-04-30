@@ -18,21 +18,40 @@ public class WordleGUI {
         setupCanvas();
 
         String currentGuess = "";
+        boolean needsRedrawn = true;
 
         while (!game.isGameOver()) {
-            drawBoard(game.getGuesses(), currentGuess, game);
+            if (needsRedrawn) {
+                drawBoard(game.getGuesses(), currentGuess, game);
+                needsRedrawn = false;
+
+            }
+
 
             if (StdDraw.hasNextKeyTyped()) {
                 char key = StdDraw.nextKeyTyped();
+                key = Character.toLowerCase(key);
 
                 if (Character.isLetter(key) && currentGuess.length() < 5) {
                     currentGuess += Character.toLowerCase(key);
+                    needsRedrawn = true;
                 } else if (key == '\b' && !currentGuess.isEmpty()) {
                     currentGuess = currentGuess.substring(0, currentGuess.length() - 1);
-                } else if (key == '\n' && currentGuess.length() == 5) {
-                    game.addGuess(currentGuess);
-                    updateKeyboardColors(currentGuess, game.getAnswer());
-                    currentGuess = "";
+                    needsRedrawn = true;
+
+                } else if (key == '\n' || key == '\r' && currentGuess.length() == 5) {
+                    if (game.isValidGuess(currentGuess)) {
+                        game.addGuess(currentGuess);
+                        updateKeyboardColors(currentGuess, game.getAnswer());
+                        currentGuess = "";
+
+                    } else {
+                        showInvalidWordMessage();
+
+                    }
+
+
+                    needsRedrawn = true;
                 }
             }
 
@@ -42,6 +61,15 @@ public class WordleGUI {
         drawBoard(game.getGuesses(), "", game);
         drawGameOver(game.getAnswer(), game.getGuesses().getLast().equals(game.getAnswer()));
     }
+
+    public void showInvalidWordMessage() {
+        StdDraw.setPenColor(Color.RED);
+        StdDraw.setFont(new Font("Arial", Font.BOLD, 16));
+        StdDraw.text(0, -90, "Not in word list!");
+        StdDraw.show();
+        StdDraw.pause(800);
+    }
+
 
     private void setupCanvas() {
         StdDraw.setCanvasSize(560, 560);
@@ -73,11 +101,22 @@ public class WordleGUI {
         double startX = -40, startY = 85;
 
         for (int row = 0; row < 6; row++) {
-            String guess = (row < guesses.size()) ? guesses.get(row) :
-                    (row == guesses.size() ? currentGuess : "");
+            String guess;
+            if (row < guesses.size()) {
+                guess = guesses.get(row);
+            } else if (row == guesses.size()) {
+                guess = currentGuess;
+            } else {
+                guess = "";
+            }
 
-            ArrayList<String> feedback = (row < guesses.size()) ?
-                    Wordle.checkGuess(guess, game.getAnswer()) : null;
+            ArrayList<String> feedback;
+            if (row < guesses.size()) {
+                feedback = Wordle.checkGuess(guess, game.getAnswer());
+            } else {
+                feedback = null;
+            }
+
 
             for (int col = 0; col < 5; col++) {
                 double x = startX + col * 20;

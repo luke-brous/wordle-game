@@ -27,7 +27,6 @@ public class Wordle {
     }
 
     //For test purposes
-
     public Wordle(String answer, ArrayList<String> dictionary) {
         this.answer = answer.toLowerCase();
         this.dictionary = dictionary;
@@ -55,12 +54,13 @@ public class Wordle {
      * Checks if a guess is valid.
      *
      * @param guess      the word to validate
-     * @param dictionary the list of valid words
      * @return true if guess is valid, false otherwise
      */
-    public static boolean isValidGuess(String guess, ArrayList<String> dictionary) {
+    public boolean isValidGuess(String guess) {
         return guess.length() == 5 && dictionary.contains(guess);
     }
+
+
 
     /**
      * Adds a guess to the list if it is valid and the game is not over.
@@ -69,7 +69,7 @@ public class Wordle {
      * @return true if the guess was added, false if invalid or game over
      */
     public boolean addGuess(String guess) {
-        if (isValidGuess(guess, dictionary) && guesses.size() < 6 && !isGameOver()) {
+        if (isValidGuess(guess) && guesses.size() < 6 && !isGameOver()) {
             guesses.add(guess.toLowerCase());
             return true;
         }
