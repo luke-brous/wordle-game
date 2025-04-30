@@ -17,11 +17,17 @@ public class Wordle {
     private final Random rand = new Random();
 
     /**
-     * Constructs a Wordle game with a given answer and dictionary.
+     * Constructs a Wordle game that chooses a random answer from the dictionary.
      *
-     * @param answer     the initial answer word
      * @param dictionary the list of valid guess words
      */
+    public Wordle(ArrayList<String> dictionary) {
+        this.dictionary = dictionary;
+        pickRandomAnswer();
+    }
+
+    //For test purposes
+
     public Wordle(String answer, ArrayList<String> dictionary) {
         this.answer = answer.toLowerCase();
         this.dictionary = dictionary;
@@ -42,7 +48,6 @@ public class Wordle {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        StdOut.println(words.size());
         return words;
     }
 
@@ -55,6 +60,20 @@ public class Wordle {
      */
     public static boolean isValidGuess(String guess, ArrayList<String> dictionary) {
         return guess.length() == 5 && dictionary.contains(guess);
+    }
+
+    /**
+     * Adds a guess to the list if it is valid and the game is not over.
+     *
+     * @param guess the guessed word
+     * @return true if the guess was added, false if invalid or game over
+     */
+    public boolean addGuess(String guess) {
+        if (isValidGuess(guess, dictionary) && guesses.size() < 6 && !isGameOver()) {
+            guesses.add(guess.toLowerCase());
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -71,7 +90,7 @@ public class Wordle {
 
         for (char c : answer.toCharArray()) {
             frequency.put(c, frequency.getOrDefault(c, 0) + 1);
-            feedback.add("red");
+            feedback.add("gray");
         }
 
         // First pass: mark greens
@@ -97,12 +116,32 @@ public class Wordle {
     }
 
     /**
+     * Returns color feedback for the most recent guess.
+     *
+     * @return list of "green", "yellow", or "red" indicators; null if no guesses made
+     */
+    public ArrayList<String> getLastFeedback() {
+        if (guesses.isEmpty()) return null;
+        return checkGuess(guesses.get(guesses.size() - 1), answer);
+    }
+
+    /**
+     * Returns the list of all guesses made so far.
+     *
+     * @return list of guessed words
+     */
+    public ArrayList<String> getGuesses() {
+        return guesses;
+    }
+
+
+    /**
      * Determines whether the game is over.
      *
      * @return true if game over, false otherwise
      */
     public boolean isGameOver() {
-        return !guesses.isEmpty() && guesses.get(guesses.size() - 1).equals(answer);
+        return (!guesses.isEmpty() && guesses.get(guesses.size() - 1).equals(answer)) || guesses.size() >= 6;
     }
 
     /**
