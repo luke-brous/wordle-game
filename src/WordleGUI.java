@@ -7,26 +7,33 @@ public class WordleGUI {
 
     private final Map<Character, String> keyboardColors = new HashMap<>();
 
+
     public static void main(String[] args) {
         ArrayList<String> dictionary = Wordle.loadDictionary();
-        Wordle game = new Wordle(dictionary);
-        new WordleGUI().playGame(game);
+        WordleGUI gui = new WordleGUI();
+
+        do {
+            Wordle game = new Wordle(dictionary);
+            gui.playGame(game);
+        } while (gui.restartButtonClick());
     }
 
-
+    /**
+     * Runs one instance of the Wordle game loop, handling input and rendering.
+     * @param game the Wordle game instance
+     */
     public void playGame(Wordle game) {
+        keyboardColors.clear();
         setupCanvas();
 
         String currentGuess = "";
         boolean needsRedrawn = true;
 
-        while (!game.isGameOver()) {
+        while (game.isGameOver()) {
             if (needsRedrawn) {
                 drawBoard(game.getGuesses(), currentGuess, game);
                 needsRedrawn = false;
-
             }
-
 
             if (StdDraw.hasNextKeyTyped()) {
                 char key = StdDraw.nextKeyTyped();
@@ -38,19 +45,14 @@ public class WordleGUI {
                 } else if (key == '\b' && !currentGuess.isEmpty()) {
                     currentGuess = currentGuess.substring(0, currentGuess.length() - 1);
                     needsRedrawn = true;
-
                 } else if (key == '\n' || key == '\r' && currentGuess.length() == 5) {
                     if (game.isValidGuess(currentGuess)) {
                         game.addGuess(currentGuess);
                         updateKeyboardColors(currentGuess, game.getAnswer());
                         currentGuess = "";
-
                     } else {
                         showInvalidWordMessage();
-
                     }
-
-
                     needsRedrawn = true;
                 }
             }
@@ -62,15 +64,20 @@ public class WordleGUI {
         drawGameOver(game.getAnswer(), game.getGuesses().getLast().equals(game.getAnswer()));
     }
 
+    /**
+     * Displays a temporary error message if the user enters a word not in the dictionary.
+     */
     public void showInvalidWordMessage() {
         StdDraw.setPenColor(Color.RED);
-        StdDraw.setFont(new Font("Arial", Font.BOLD, 16));
+        StdDraw.setFont(new Font("Arial", Font.BOLD, 24));
         StdDraw.text(0, -90, "Not in word list!");
         StdDraw.show();
         StdDraw.pause(800);
     }
 
-
+    /**
+     * Sets up the StdDraw canvas size, scale, and enables double buffering.
+     */
     private void setupCanvas() {
         StdDraw.setCanvasSize(560, 560);
         StdDraw.setXscale(-100, 100);
@@ -78,6 +85,11 @@ public class WordleGUI {
         StdDraw.enableDoubleBuffering();
     }
 
+    /**
+     * Updates keyboard colors based on guess feedback.
+     * @param guess the user's guessed word
+     * @param answer the correct answer word
+     */
     private void updateKeyboardColors(String guess, String answer) {
         ArrayList<String> feedback = Wordle.checkGuess(guess, answer);
 
@@ -94,11 +106,20 @@ public class WordleGUI {
         }
     }
 
+    /**
+     * Draws the Wordle board with guesses, feedback, and the current guess.
+     * @param guesses list of completed guesses
+     * @param currentGuess the current guess in progress
+     * @param game the Wordle game instance
+     */
     public void drawBoard(ArrayList<String> guesses, String currentGuess, Wordle game) {
         StdDraw.clear(Color.WHITE);
+        StdDraw.setPenColor(Color.BLACK);
+        StdDraw.setFont(new Font("Arial", Font.BOLD, 24));
+        StdDraw.text(0, 93, "Wordle");
 
         double boxSize = 9;
-        double startX = -40, startY = 85;
+        double startX = -40, startY = 77;
 
         for (int row = 0; row < 6; row++) {
             String guess;
@@ -116,7 +137,6 @@ public class WordleGUI {
             } else {
                 feedback = null;
             }
-
 
             for (int col = 0; col < 5; col++) {
                 double x = startX + col * 20;
@@ -137,7 +157,7 @@ public class WordleGUI {
                         StdDraw.filledSquare(x, y, boxSize);
                         StdDraw.setPenColor(Color.WHITE);
                     }
-
+                    StdDraw.setFont(new Font("Arial", Font.BOLD, 18));
                     StdDraw.text(x, y, String.valueOf(Character.toUpperCase(ch)));
                 }
             }
@@ -147,11 +167,13 @@ public class WordleGUI {
         StdDraw.show();
     }
 
-
+    /**
+     * Draws the on-screen keyboard with color feedback for each letter.
+     */
     public void drawKeyboard() {
         String[] rows = {"qwertyuiop", "asdfghjkl", "zxcvbnm"};
         double keyWidth = 16, keyHeight = 14;
-        double baseX = -80, baseY = -45;
+        double baseX = -80, baseY = -49;
 
         for (int r = 0; r < rows.length; r++) {
             String row = rows[r];
@@ -181,61 +203,62 @@ public class WordleGUI {
                 StdDraw.filledRectangle(x, y, keyWidth / 2, keyHeight / 2);
                 StdDraw.setPenColor(Color.BLACK);
                 StdDraw.rectangle(x, y, keyWidth / 2, keyHeight / 2);
+                StdDraw.setFont(new Font("Arial", Font.BOLD, 16));
                 StdDraw.text(x, y, String.valueOf(letter));
             }
         }
     }
 
-
+    /**
+     * Displays the end-of-game message indicating win or loss.
+     * @param answer the correct answer word
+     * @param win true if the player guessed the word correctly
+     */
     public void drawGameOver(String answer, boolean win) {
-        StdDraw.setPenColor(Color.BLACK);
-        StdDraw.setFont(new Font("Arial", Font.BOLD, 28));
+        StdDraw.setFont(new Font("Arial", Font.BOLD, 36));
 
-        String message = win ? "You won!" : "You lost. Answer: " + answer.toUpperCase();
+        String message;
+        if (win) {
+            StdDraw.setPenColor(Color.GREEN);
+            message = "You won!";
+        } else {
+            StdDraw.setPenColor(Color.RED);
+            message = "You lost. Answer: " + answer.toUpperCase();
+        }
+
         StdDraw.text(0, 0, message);
-
         StdDraw.show();
-        StdDraw.setFont(new Font("Arial", Font.PLAIN, 14));
+        StdDraw.setFont(new Font("Arial", Font.PLAIN, 18));
     }
 
+    /**
+     * Draws a restart button and waits for the user to click it.
+     * @return true if the button is clicked
+     */
+    public boolean restartButtonClick() {
+        double buttonX = 0;
+        double buttonY = -65;
+        double buttonWidth = 50;
+        double buttonHeight = 30;
 
-    public boolean restartButtonClick{
-        double buttonX = 80;
-        double buttonY = -80;
-        double buttonWidth = 10;
-        double buttonHeight = 10;
-
-        StdDraw.setPenColor(Color.CYAN);
+        StdDraw.setPenColor(Color.darkGray);
         StdDraw.filledRectangle(buttonX, buttonY, buttonWidth / 2, buttonHeight / 2);
         StdDraw.setPenColor(Color.WHITE);
+        StdDraw.setFont(new Font("Arial", Font.BOLD, 24));
         StdDraw.text(buttonX, buttonY, "Restart");
         StdDraw.show();
 
-        while(true) {
-            if (StdDraw.isMousePressed()){
-                double mouseX = StdDraw.mouseX();
-                double mouseY = StdDraw.mouseY();
-                if (mouseX >= buttonX - buttonWidth && mouseX <= buttonX - buttonWidth &&
-                    mouseY >= buttonY - buttonHeight && mouseY <= buttonY - buttonHeight){
-
+        while (true) {
+            if (StdDraw.isMousePressed()) {
+                double mx = StdDraw.mouseX();
+                double my = StdDraw.mouseY();
+                if (mx >= buttonX - buttonWidth / 2 && mx <= buttonX + buttonWidth / 2 &&
+                        my >= buttonY - buttonHeight / 2 && my <= buttonY + buttonHeight / 2) {
                     StdDraw.pause(200);
                     return true;
-
                 }
             }
             StdDraw.pause(10);
         }
-
-
-
-
     }
-
-
 }
-
-
-
-
-
-

@@ -26,12 +26,6 @@ public class Wordle {
         pickRandomAnswer();
     }
 
-    //For test purposes
-    public Wordle(String answer, ArrayList<String> dictionary) {
-        this.answer = answer.toLowerCase();
-        this.dictionary = dictionary;
-    }
-
     /**
      * Loads all 5-letter words into a list.
      *
@@ -66,14 +60,11 @@ public class Wordle {
      * Adds a guess to the list if it is valid and the game is not over.
      *
      * @param guess the guessed word
-     * @return true if the guess was added, false if invalid or game over
      */
-    public boolean addGuess(String guess) {
-        if (isValidGuess(guess) && guesses.size() < 6 && !isGameOver()) {
+    public void addGuess(String guess) {
+        if (isValidGuess(guess) && guesses.size() < 6 && isGameOver()) {
             guesses.add(guess.toLowerCase());
-            return true;
         }
-        return false;
     }
 
     /**
@@ -141,15 +132,7 @@ public class Wordle {
      * @return true if game over, false otherwise
      */
     public boolean isGameOver() {
-        return (!guesses.isEmpty() && guesses.get(guesses.size() - 1).equals(answer)) || guesses.size() >= 6;
-    }
-
-    /**
-     * Clears previous guesses and selects a new random answer.
-     */
-    public void reset() {
-        guesses.clear();
-        pickRandomAnswer();
+        return (guesses.isEmpty() || !guesses.getLast().equals(answer)) && guesses.size() < 6;
     }
 
     /**
